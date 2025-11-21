@@ -1,33 +1,40 @@
-Super Mario Bros Level 1
+Prototipo de Interacción Humano-Máquina usando Lenguaje Corporal.
 =============
 
-An attempt to recreate the first level of Super Mario Bros.
+Innovation Fest 2025
 
-![screenshot](https://raw.github.com/justinmeister/Mario-Level-1/master/screenshot.png)
+Este repositorio utiliza la implementación original [Mario-Level-1](https://github.com/justinmeister/Mario-Level-1) de [justinmeister](https://github.com/justinmeister) como motor de juego para simular el primer nivel del juego clásico de Mario. 
 
-CONTROLS: 
+El código permite jugar el nivel usando expresiones corporales para sustituir el uso de botones: 
 
-Arrow keys for direction
+* Mano Derecha: Controla el avance retroceso del personaje. 
+* Mano Izquierda: Controla los saltos del personaje. 
+* Pierna derecha: Controla el botón de acción.
 
-'a' for jump
+## Instalación: 
+El juego requiere de la instalación de Python 3 y las siguientes librerías: 
 
-'s' for action (fireball, run)
+```
+pip3 install opencv-python
+pip3 install numpy
+pip3 install pygame
+pip3 install mediapipe
+```
+
+## Uso: 
+Primero, ejecutar el modelo de detección de Pose:
+
+```
+python run_model.py
+```
+
+Posteriormente, ejecutar el juego:
+
+```
+python mario_level_1.py
+```
 
 
-DEPENDENCIES:
+**DISCLAIMER:**
 
-Pygame 1.9.1 (Python 2)
-
-Pygame 1.9.2 (Python 3) - a little trickier to get going.
-
-To install dependencies for Python 2.x:
-
-	pip install -r requirements.txt
-
-VIDEO DEMO:
-
-http://www.youtube.com/watch?v=HBbzYKMfx5Y
-   
-DISCLAIMER:
-
-This project is intended for non-commercial educational purposes.
+Este proyecto está desarrollado únicamente para fines educativos y de aprendizaje.

@@ -4,6 +4,31 @@ import pygame as pg
 from .. import setup, tools
 from .. import constants as c
 from . import powerups
+import csv 
+import numpy as np
+
+def get_keys_conf(file):
+
+    data = {}
+
+    #Default set
+    data['right'] = 0
+    data['left'] = 0
+    data['jump'] = 0
+    data['action'] = 0
+
+    with open(file, 'r', newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for index, row in enumerate(reader):
+            if(index == 0):
+                continue 
+            else:
+                data['right'] = np.array(row).astype("int")[0]
+                data['left'] = np.array(row).astype("int")[1]
+                data['jump'] = np.array(row).astype("int")[2]
+                data['action'] = np.array(row).astype("int")[3]
+    
+    return data
 
 
 class Mario(pg.sprite.Sprite):
@@ -23,6 +48,9 @@ class Mario(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
 
         self.key_timer = 0
+
+        #Data path
+        self.data_path = "data//components//actions.csv"
 
 
     def setup_timers(self):
@@ -45,8 +73,8 @@ class Mario(pg.sprite.Sprite):
         self.allow_jump = True
         self.dead = False
         self.invincible = False
-        self.big = False
-        self.fire = False
+        self.big = True
+        self.fire = True
         self.allow_fireball = True
         self.in_transition_state = False
         self.hurt_invincible = False
@@ -433,6 +461,10 @@ class Mario(pg.sprite.Sprite):
 
 
     def standing(self, keys, fire_group):
+
+        #Get keys
+        data = get_keys_conf(self.data_path)
+
         """This function is called if Mario is standing still"""
         self.check_to_allow_jump(keys)
         self.check_to_allow_fireball(keys)
@@ -441,22 +473,26 @@ class Mario(pg.sprite.Sprite):
         self.x_vel = 0
         self.y_vel = 0
 
-        if keys[tools.keybinding['action']]:
+        if data['action']:
+        #if keys[tools.keybinding['action']]:
             if self.fire and self.allow_fireball:
                 self.shoot_fireball(fire_group)
 
         if keys[tools.keybinding['down']]:
             self.crouching = True
 
-        if keys[tools.keybinding['left']]:
+        if data['left']:
+        #if keys[tools.keybinding['left']]:
             self.facing_right = False
             self.get_out_of_crouch()
             self.state = c.WALK
-        elif keys[tools.keybinding['right']]:
+        elif data['right']:
+        #elif keys[tools.keybinding['right']]:
             self.facing_right = True
             self.get_out_of_crouch()
             self.state = c.WALK
-        elif keys[tools.keybinding['jump']]:
+        elif data['jump']:
+        #elif keys[tools.keybinding['jump']]:
             if self.allow_jump:
                 if self.big:
                     setup.SFX['big_jump'].play()
@@ -532,6 +568,9 @@ class Mario(pg.sprite.Sprite):
         It changes the frame, checks for holding down the run button,
         checks for a jump, then adjusts the state if necessary"""
 
+        #Get keys
+        data = get_keys_conf(self.data_path)
+
         self.check_to_allow_jump(keys)
         self.check_to_allow_fireball(keys)
 
@@ -548,7 +587,8 @@ class Mario(pg.sprite.Sprite):
 
                 self.walking_timer = self.current_time
 
-        if keys[tools.keybinding['action']]:
+        if data['action']:
+        #if keys[tools.keybinding['action']]:
             self.max_x_vel = c.MAX_RUN_SPEED
             self.x_accel = c.RUN_ACCEL
             if self.fire and self.allow_fireball:
@@ -557,7 +597,8 @@ class Mario(pg.sprite.Sprite):
             self.max_x_vel = c.MAX_WALK_SPEED
             self.x_accel = c.WALK_ACCEL
 
-        if keys[tools.keybinding['jump']]:
+        if data['jump']:
+        #if keys[tools.keybinding['jump']]:
             if self.allow_jump:
                 if self.big:
                     setup.SFX['big_jump'].play()
@@ -570,7 +611,8 @@ class Mario(pg.sprite.Sprite):
                     self.y_vel = c.JUMP_VEL
 
 
-        if keys[tools.keybinding['left']]:
+        if data['left']:
+        #if keys[tools.keybinding['left']]:
             self.get_out_of_crouch()
             self.facing_right = False
             if self.x_vel > 0:
@@ -586,7 +628,8 @@ class Mario(pg.sprite.Sprite):
             elif self.x_vel < (self.max_x_vel * -1):
                 self.x_vel += self.x_accel
 
-        elif keys[tools.keybinding['right']]:
+        elif(data['right']):
+        #elif keys[tools.keybinding['right']]:
             self.get_out_of_crouch()
             self.facing_right = True
             if self.x_vel < 0:
@@ -642,19 +685,26 @@ class Mario(pg.sprite.Sprite):
             self.gravity = c.GRAVITY
             self.state = c.FALL
 
-        if keys[tools.keybinding['left']]:
+        #Get keys
+        data = get_keys_conf(self.data_path)
+
+        if data['left']:
+        #if keys[tools.keybinding['left']]:
             if self.x_vel > (self.max_x_vel * - 1):
                 self.x_vel -= self.x_accel
 
-        elif keys[tools.keybinding['right']]:
+        elif data['right']:
+        #elif keys[tools.keybinding['right']]:
             if self.x_vel < self.max_x_vel:
                 self.x_vel += self.x_accel
 
-        if not keys[tools.keybinding['jump']]:
+        if not data['jump']:
+        #if not keys[tools.keybinding['jump']]:
             self.gravity = c.GRAVITY
             self.state = c.FALL
 
-        if keys[tools.keybinding['action']]:
+        if data['action']:
+        #if keys[tools.keybinding['action']]:
             if self.fire and self.allow_fireball:
                 self.shoot_fireball(fire_group)
 
@@ -662,18 +712,25 @@ class Mario(pg.sprite.Sprite):
     def falling(self, keys, fire_group):
         """Called when Mario is in a FALL state"""
         self.check_to_allow_fireball(keys)
+
+        #Get keys
+        data = get_keys_conf(self.data_path)
+
         if self.y_vel < c.MAX_Y_VEL:
             self.y_vel += self.gravity
 
-        if keys[tools.keybinding['left']]:
+        if data['left']:
+        #if keys[tools.keybinding['left']]:
             if self.x_vel > (self.max_x_vel * - 1):
                 self.x_vel -= self.x_accel
 
-        elif keys[tools.keybinding['right']]:
+        elif data['right']:
+        #elif keys[tools.keybinding['right']]:
             if self.x_vel < self.max_x_vel:
                 self.x_vel += self.x_accel
 
-        if keys[tools.keybinding['action']]:
+        if data['action']:
+        #if keys[tools.keybinding['action']]:
             if self.fire and self.allow_fireball:
                 self.shoot_fireball(fire_group)
 
